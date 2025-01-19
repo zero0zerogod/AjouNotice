@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -42,35 +43,33 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController() // 네비게이션 컨트롤러 생성
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) // 사이드바의 초기 상태 설정 (닫힌 상태)
+    val drawerState =
+        rememberDrawerState(initialValue = DrawerValue.Closed) // 사이드바의 초기 상태 설정 (닫힌 상태)
     val scope = rememberCoroutineScope() // 코루틴 스코프 생성
 
-    ModalNavigationDrawer(
-        drawerState = drawerState, // 사이드바 상태
+    ModalNavigationDrawer(drawerState = drawerState, // 사이드바 상태
         drawerContent = {
             Sidebar(navController = navController, drawerState = drawerState) // 사이드바 composable
-        }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("ScheSchedule") }, // App Bar 제목 설정
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                drawerState.open() // 메뉴 버튼 클릭 시 사이드바 열기
-                            }
-                        }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu") // 햄버거 메뉴 아이콘
+        }) {
+        Scaffold(topBar = {
+            TopAppBar(title = { Text("ScheSchedule") }, // App Bar 제목 설정
+                navigationIcon = {
+                    IconButton(onClick = {
+                        scope.launch {
+                            drawerState.open() // 메뉴 버튼 클릭 시 사이드바 열기
                         }
+                    }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu") // 햄버거 메뉴 아이콘
                     }
-                )
-            },
-            content = { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    NavGraph(navController = navController) // 네비게이션 그래프 추가
-                }
+                })
+        }, content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                NavGraph(navController = navController) // 네비게이션 그래프 추가
             }
-        )
+        })
     }
 }

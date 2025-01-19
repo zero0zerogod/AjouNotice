@@ -5,5 +5,6 @@ data class Notice(
     val category: String,
     val title: String,
     val department: String,
-    val date: String
+    val date: String,
+    val link: String
 )
