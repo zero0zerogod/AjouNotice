@@ -1,5 +1,7 @@
 package com.example.scheschedule.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
@@ -13,10 +15,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scheschedule.model.Notice
+import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NoticeRow(notice: Notice) {
     val uriHandler = LocalUriHandler.current // URI 처리기
+
+    // 날짜 비교 로직
+    val isRecent = LocalDate.now().minusDays(3).isBefore(LocalDate.parse(notice.date))
 
     Column(
         modifier = Modifier
@@ -25,13 +32,16 @@ fun NoticeRow(notice: Notice) {
             .padding(vertical = 8.dp, horizontal = 16.dp)
     ) {
         // 제목
-        Text(
-            text = notice.title,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = notice.title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
 
         Spacer(modifier = Modifier.height(4.dp))
 
@@ -50,6 +60,16 @@ fun NoticeRow(notice: Notice) {
                 fontSize = 14.sp,
                 color = Color.Gray
             )
+
+            if (isRecent) {
+                Text(
+                    text = "new",
+                    fontSize = 12.sp,
+                    color = Color.Red,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+
             // 가로 공간 확보
             Spacer(modifier = Modifier.weight(1f))
 
@@ -60,7 +80,5 @@ fun NoticeRow(notice: Notice) {
                 color = Color.Gray
             )
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
     }
 }

@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    // 구글 서비스 플러그인 적용
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -43,12 +45,25 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"") // local.properties에서 로드된 URL 사용
+            // 에뮬레이터 -> 로컬 서버
+            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8080/\"") // 로컬 서버
         }
 
         release {
-            // 환경변수 기반으로 설정된 API_BASE_URL 사용
-            buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
+            // 1) .env 파일 로드
+            val envFile = rootProject.file(".env")
+            val props = Properties()
+
+            if (envFile.exists()) {
+                props.load(envFile.inputStream())
+            }
+
+            // 2) .env 에서 실제 서버 주소 가져오기
+            val releaseServerUrl = props.getProperty("RELEASE_SERVER_URL", "https://default-server.com/")
+
+            // 3) release 빌드에 실제 서버 주소 주입
+            buildConfigField("String", "API_BASE_URL", "\"$releaseServerUrl\"")
+
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
@@ -68,6 +83,9 @@ android {
 }
 
 dependencies {
+    // firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -77,6 +95,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.messaging.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

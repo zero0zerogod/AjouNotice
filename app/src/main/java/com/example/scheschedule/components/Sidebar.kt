@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
@@ -259,7 +258,11 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                         drawerState,
                         scope,
                         icon = {
-                            Icon(Icons.Default.Memory, contentDescription = "AI_SEMI Icon")
+                            Icon(
+                                painter = painterResource(id = R.drawable.cpu),
+                                contentDescription = "AI_SEMI Icon",
+                                modifier = Modifier.size(24.dp)
+                            )
                         },
                         paddingStart = 64
                     )
@@ -269,6 +272,10 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
 
             SidebarButton("설정", navController, "settings", drawerState, scope) {
                 Icon(Icons.Default.Settings, contentDescription = "Settings")
+            }
+
+            SidebarButton("About", navController, "info", drawerState, scope) {
+                Icon(Icons.Default.Info, contentDescription = "Information")
             }
         }
     }

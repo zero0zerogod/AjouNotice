@@ -1,5 +1,7 @@
 package com.example.scheschedule.ui.viewmodel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scheschedule.model.Notice
@@ -7,6 +9,7 @@ import com.example.scheschedule.repository.NoticeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class NoticeViewModel : ViewModel() {
     private val repository = NoticeRepository() // NoticeRepository 객체 생성
@@ -91,5 +94,13 @@ class NoticeViewModel : ViewModel() {
                 _aiSemiError.value = e.message
             }
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun hasRecentNotices(notices: List<Notice>): Boolean {
+    return notices.any { notice ->
+        val postDate = LocalDate.parse(notice.date) // notice.date가 yyyy-MM-dd 형식이라고 가정
+        postDate.isAfter(LocalDate.now().minusDays(3))
     }
 }
