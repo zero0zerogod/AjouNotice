@@ -1,5 +1,7 @@
 package com.example.scheschedule.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,6 +16,7 @@ import com.example.scheschedule.ui.notice.ECENoticeScreen
 import com.example.scheschedule.ui.notice.GeneralNoticeScreen
 import com.example.scheschedule.ui.notice.ScholarshipNoticeScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavGraph(navController: NavHostController) {
     NavHost(

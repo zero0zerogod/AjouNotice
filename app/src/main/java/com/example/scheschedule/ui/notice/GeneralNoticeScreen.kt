@@ -14,11 +14,14 @@ import com.example.scheschedule.ui.viewmodel.hasRecentNotices
 fun GeneralNoticeScreen(viewModel: NoticeViewModel = viewModel()) {
     val notices by viewModel.generalNotices.collectAsState()
     val error by viewModel.generalError.collectAsState()
-    // 3일 이내 게시글 존재 여부 확인
-    val isRecentExists = hasRecentNotices(notices)
+    val isRecentExists = hasRecentNotices(notices)     // 3일 이내 게시글 존재 여부 확인
 
     NoticeListScreen(
-        title = "일반 공지사항", notices = notices, error = error, isRecentExists = isRecentExists
-
+        title = "일반 공지사항",
+        notices = notices,
+        error = error,
+        isRecentExists = isRecentExists,
+        viewModel = viewModel,
+        type = "general"
     )
 }

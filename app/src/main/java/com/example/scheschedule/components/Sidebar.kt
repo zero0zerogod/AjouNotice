@@ -179,17 +179,21 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
             }
             // 사용 예시
             if (isNoticeExpanded.value) {
-                SubSidebarButton("일반 공지사항",
+                SubSidebarButton(
+                    "일반 공지사항",
                     navController,
                     "notice/general",
                     drawerState,
                     scope,
                     icon = {
                         Icon(
-                            Icons.Filled.Info, contentDescription = "General Icon"
+                            painter = painterResource(id = R.drawable.chat),
+                            contentDescription = "General Icon",
+                            modifier = Modifier.size(24.dp), // 아이콘 크기
                         )
                     })
-                SubSidebarButton("장학 공지사항",
+                SubSidebarButton(
+                    "장학 공지사항",
                     navController,
                     "notice/scholarship",
                     drawerState,
@@ -197,7 +201,8 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                     icon = {
                         Icon(Icons.Default.School, contentDescription = "Scholarship Icon")
                     })
-                SubSidebarButton("생활관 공지사항",
+                SubSidebarButton(
+                    "생활관 공지사항",
                     navController,
                     "notice/dormitory",
                     drawerState,

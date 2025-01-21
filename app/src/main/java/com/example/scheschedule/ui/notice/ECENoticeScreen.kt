@@ -17,5 +17,12 @@ fun ECENoticeScreen(viewModel: NoticeViewModel = viewModel()) {
     // 3일 이내 게시글 존재 여부 확인
     val isRecentExists = hasRecentNotices(notices)
 
-    NoticeListScreen(title = "전자공학과 공지사항", notices = notices, error = error, isRecentExists)
+    NoticeListScreen(
+        title = "전자공학과 공지사항",
+        notices = notices,
+        error = error,
+        isRecentExists,
+        viewModel = viewModel,
+        type = "department_ece"
+    )
 }

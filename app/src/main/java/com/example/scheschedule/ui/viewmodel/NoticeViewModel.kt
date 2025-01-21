@@ -53,11 +53,11 @@ class NoticeViewModel : ViewModel() {
 
     // 초기화 시 데이터 가져오기
     init {
-        fetchNotices()
+        fetchAllNotices()
     }
 
-    // 공지사항 데이터를 가져오는 메서드
-    private fun fetchNotices() {
+    // 1) 앱 실행하면 모든 공지사항을 불러옴
+    fun fetchAllNotices() {
         viewModelScope.launch {
             // 일반 공지사항
             try {
@@ -92,6 +92,44 @@ class NoticeViewModel : ViewModel() {
                 _aiSemiNotices.value = repository.getAiSemiNotices()
             } catch (e: Exception) {
                 _aiSemiError.value = e.message
+            }
+        }
+    }
+
+    // 2) 알림 클릭 or PullToRefresh 시 “일반 공지”만 다시 로드
+    fun refreshNotices(type: String, onComplete: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val newNotices = when (type) {
+                    "general" -> repository.getGeneralNotices()
+                    "scholarship" -> repository.getScholarshipNotices()
+                    "dormitory" -> repository.getDormitoryNotices()
+                    "department_ece" -> repository.getECENotices()
+                    "department_aisemi" -> repository.getAiSemiNotices()
+                    else -> emptyList()
+                }
+                // 변경사항 확인
+                val hasChanges = when (type) {
+                    "general" -> newNotices != _generalNotices.value
+                    "scholarship" -> newNotices != _scholarshipNotices.value
+                    "dormitory" -> newNotices != _dormitoryNotices.value
+                    "department_ece" -> newNotices != _eceNotices.value
+                    "department_aisemi" -> newNotices != _aiSemiNotices.value
+                    else -> false
+                }
+                // 변경사항이 있으면 상태 갱신
+                if (hasChanges) {
+                    when (type) {
+                        "general" -> _generalNotices.value = newNotices
+                        "scholarship" -> _scholarshipNotices.value = newNotices
+                        "dormitory" -> _dormitoryNotices.value = newNotices
+                        "department_ece" -> _eceNotices.value = newNotices
+                        "department_aisemi" -> _aiSemiNotices.value = newNotices
+                    }
+                }
+                onComplete(hasChanges) // 로드 완료 후 호출
+            } catch (e: Exception) {
+                onComplete(false) // 에러 발생 시에도 호출
             }
         }
     }

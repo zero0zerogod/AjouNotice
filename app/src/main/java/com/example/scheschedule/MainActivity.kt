@@ -1,11 +1,14 @@
 package com.example.scheschedule
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,17 +32,20 @@ import androidx.navigation.compose.rememberNavController
 import com.example.scheschedule.components.Sidebar
 import com.example.scheschedule.navigation.NavGraph
 import com.example.scheschedule.ui.theme.ScheScheduleTheme
+import com.example.scheschedule.ui.viewmodel.NoticeViewModel
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
-import android.Manifest
 
 class MainActivity : ComponentActivity() {
     companion object {
         private const val REQUEST_NOTIFICATION_PERMISSION = 100
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val viewModel: NoticeViewModel by viewModels()
+        viewModel.fetchAllNotices()
         // Android 13 이상 알림 권한 요청
         requestNotificationPermissionIfNeeded()
 
@@ -53,20 +59,20 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
     /**
      * Android 13(API 33) 이상에서 알림 권한 요청
      */
     private fun requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val permissionCheck = ContextCompat.checkSelfPermission(
-                /* context = */ this,
-                /* permission = */ Manifest.permission.POST_NOTIFICATIONS
-            )
+            val permissionCheck =
+                ContextCompat.checkSelfPermission(/* context = */ this,/* permission = */
+                    Manifest.permission.POST_NOTIFICATIONS
+                )
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                    /* activity = */ this,
-                    /* permissions = */ arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    /* requestCode = */ REQUEST_NOTIFICATION_PERMISSION
+                ActivityCompat.requestPermissions(/* activity = */ this,/* permissions = */
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),/* requestCode = */
+                    REQUEST_NOTIFICATION_PERMISSION
                 )
             }
         }
@@ -76,8 +82,7 @@ class MainActivity : ComponentActivity() {
      * FCM 토픽("notices")에 구독
      */
     private fun subscribeToNoticesTopic() {
-        FirebaseMessaging.getInstance().subscribeToTopic("notices")
-            .addOnCompleteListener { task ->
+        FirebaseMessaging.getInstance().subscribeToTopic("notices").addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     println("Successfully subscribed to topic: notices")
                 } else {
@@ -88,18 +93,20 @@ class MainActivity : ComponentActivity() {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val navController = rememberNavController() // 네비게이션 컨트롤러 생성
-    val drawerState =
-        rememberDrawerState(initialValue = DrawerValue.Closed) // 사이드바의 초기 상태 설정 (닫힌 상태)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) // 사이드바의 초기 상태 설정 (닫힌 상태)
     val scope = rememberCoroutineScope() // 코루틴 스코프 생성
 
-    ModalNavigationDrawer(drawerState = drawerState, // 사이드바 상태
+    ModalNavigationDrawer(
+        drawerState = drawerState, // 사이드바 상태
         drawerContent = {
             Sidebar(navController = navController, drawerState = drawerState) // 사이드바 composable
-        }) {
+        }
+    ) {
         Scaffold(topBar = {
             TopAppBar(title = { Text("ScheSchedule") }, // App Bar 제목 설정
                 navigationIcon = {
