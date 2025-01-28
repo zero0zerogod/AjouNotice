@@ -1,4 +1,4 @@
-package com.example.scheschedule.ui.notice
+package com.example.scheschedule.ui.screens.notice
 
 import android.os.Build
 import androidx.annotation.RequiresApi

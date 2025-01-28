@@ -1,9 +1,11 @@
 package com.example.scheschedule
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -24,10 +26,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.scheschedule.components.Sidebar
 import com.example.scheschedule.navigation.NavGraph
@@ -39,13 +44,26 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     companion object {
         private const val REQUEST_NOTIFICATION_PERMISSION = 100
+        private const val TAG = "MainActivity"
     }
+
+    private val viewModel: NoticeViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel: NoticeViewModel by viewModels()
+
+        // 초기 데이터 로드
         viewModel.fetchAllNotices()
+
+        // FCM 알림에서 전달된 noticeType 처리
+        val initialType = intent?.getStringExtra("noticeType") ?: "home"
+        viewModel.updateNoticeType(initialType)
+        Log.d(TAG, "onCreate: 알림 타입 - $initialType") // 알림 타입 확인
+
+        // BroadcastReceiver 등록
+        viewModel.registerBroadcastReceiver(this)
+
         // Android 13 이상 알림 권한 요청
         requestNotificationPermissionIfNeeded()
 
@@ -55,9 +73,35 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge() // 전체 화면을 사용하는 레이아웃을 활성화
         setContent {
             ScheScheduleTheme {
-                MainScreen() // 메인 화면 렌더링
+                val navController = rememberNavController()
+                val currentTypeState = viewModel.currentType.collectAsState()
+
+                // Compose에 전달할 현재 noticeType
+                val currentType = currentTypeState.value
+                Log.d(TAG, "onCreate: 알림 타입 - $currentTypeState")
+
+                MainScreen(navController = navController, currentType = currentType)
             }
         }
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        // 알림 클릭 등으로 새 Intent가 들어왔을 때
+        val newType = intent.getStringExtra("noticeType") ?: "home"
+        Log.d(TAG, "onNewIntent: 새로운 알림 타입 - $newType")
+
+        // ViewModel 상태 업데이트
+        viewModel.updateNoticeType(newType)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // BroadcastReceiver 해제
+        viewModel.unregisterBroadcastReceiver(this)
     }
 
     /**
@@ -83,30 +127,54 @@ class MainActivity : ComponentActivity() {
      */
     private fun subscribeToNoticesTopic() {
         FirebaseMessaging.getInstance().subscribeToTopic("notices").addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    println("Successfully subscribed to topic: notices")
-                } else {
-                    println("Failed to subscribe to topic: notices ${task.exception}")
-                }
+            if (task.isSuccessful) {
+                println("Successfully subscribed to topic: notices")
+            } else {
+                println("Failed to subscribe to topic: notices ${task.exception}")
             }
+        }
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
-    val navController = rememberNavController() // 네비게이션 컨트롤러 생성
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) // 사이드바의 초기 상태 설정 (닫힌 상태)
+fun MainScreen(navController: NavHostController, currentType: String) {
+    // 사이드바의 초기 상태 설정 (닫힌 상태)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope() // 코루틴 스코프 생성
 
-    ModalNavigationDrawer(
-        drawerState = drawerState, // 사이드바 상태
+    // 알림 타입에 따른 네비게이션
+    LaunchedEffect(currentType) {
+        val destination = when (currentType) {
+            "general" -> "notice/general"
+            "scholarship" -> "notice/scholarship"
+            "dormitory" -> "notice/dormitory"
+            "department_ece" -> "notice/department_ece"
+            "department_aisemi" -> "notice/department_aisemi"
+            else -> "home"
+        }
+
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
+        Log.d("MainScreen", "현재 경로: $currentRoute, 이동할 경로: $destination")
+
+        // 이미 같은 라우트면 navigate를 호출하지 않아도 됨
+        if (currentRoute != destination) {
+            navController.navigate(destination) {
+                // 기존에 inclusive=true로 startDestination까지 날려버리면 계속 home->home으로 보이는 상황 가능
+                // 필요 시 popUpTo → inclusive=false 로 조정
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = false
+                }
+                launchSingleTop = true
+            }
+        }
+    }
+
+    ModalNavigationDrawer(drawerState = drawerState, // 사이드바 상태
         drawerContent = {
             Sidebar(navController = navController, drawerState = drawerState) // 사이드바 composable
-        }
-    ) {
+        }) {
         Scaffold(topBar = {
             TopAppBar(title = { Text("ScheSchedule") }, // App Bar 제목 설정
                 navigationIcon = {
@@ -124,7 +192,8 @@ fun MainScreen() {
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                NavGraph(navController = navController) // 네비게이션 그래프 추가
+                Log.d("MainScreen", "Scaffold: NavGraph 설정 시작")
+                NavGraph(navController = navController)
             }
         })
     }

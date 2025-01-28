@@ -13,8 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Domain
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Home
@@ -179,21 +179,21 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
             }
             // 사용 예시
             if (isNoticeExpanded.value) {
-                SubSidebarButton(
-                    "일반 공지사항",
+                SubSidebarButton("일반 공지사항",
                     navController,
                     "notice/general",
                     drawerState,
                     scope,
                     icon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.chat),
+                            painter = painterResource(id = R.drawable.document),
                             contentDescription = "General Icon",
-                            modifier = Modifier.size(24.dp), // 아이콘 크기
+                            modifier = Modifier
+                                .size(22.dp)
+                                .padding(start=1.dp, end = 1.dp)
                         )
                     })
-                SubSidebarButton(
-                    "장학 공지사항",
+                SubSidebarButton("장학 공지사항",
                     navController,
                     "notice/scholarship",
                     drawerState,
@@ -201,8 +201,7 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                     icon = {
                         Icon(Icons.Default.School, contentDescription = "Scholarship Icon")
                     })
-                SubSidebarButton(
-                    "생활관 공지사항",
+                SubSidebarButton("생활관 공지사항",
                     navController,
                     "notice/dormitory",
                     drawerState,
@@ -226,7 +225,7 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                             .padding(start = 32.dp),
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Domain, contentDescription = "Department Icon")
+                        Icon(Icons.Default.Book, contentDescription = "Department Icon")
                         Text(
                             text = "학과 공지사항", modifier = Modifier.padding(start = 8.dp)
                         )
@@ -266,7 +265,8 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                             Icon(
                                 painter = painterResource(id = R.drawable.cpu),
                                 contentDescription = "AI_SEMI Icon",
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier
+                                    .size(24.dp)
                             )
                         },
                         paddingStart = 64

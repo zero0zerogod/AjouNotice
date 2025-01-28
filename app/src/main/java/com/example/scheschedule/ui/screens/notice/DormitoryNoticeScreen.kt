@@ -1,4 +1,4 @@
-package com.example.scheschedule.ui.notice
+package com.example.scheschedule.ui.screens.notice
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -11,17 +11,18 @@ import com.example.scheschedule.ui.viewmodel.hasRecentNotices
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun GeneralNoticeScreen(viewModel: NoticeViewModel = viewModel()) {
-    val notices by viewModel.generalNotices.collectAsState()
-    val error by viewModel.generalError.collectAsState()
-    val isRecentExists = hasRecentNotices(notices)     // 3일 이내 게시글 존재 여부 확인
+fun DormitoryNoticeScreen(viewModel: NoticeViewModel = viewModel()) {
+    val notices by viewModel.dormitoryNotices.collectAsState()
+    val error by viewModel.dormitoryError.collectAsState()
+    // 3일 이내 게시글 존재 여부 확인
+    val isRecentExists = hasRecentNotices(notices)
 
     NoticeListScreen(
-        title = "일반 공지사항",
+        title = "생활관 공지사항",
         notices = notices,
         error = error,
-        isRecentExists = isRecentExists,
+        isRecentExists,
         viewModel = viewModel,
-        type = "general"
+        type = "dormitory"
     )
 }

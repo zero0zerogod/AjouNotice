@@ -1,9 +1,15 @@
 package com.example.scheschedule.ui.viewmodel
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.scheschedule.model.Notice
 import com.example.scheschedule.repository.NoticeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,126 +19,102 @@ import java.time.LocalDate
 
 class NoticeViewModel : ViewModel() {
     private val repository = NoticeRepository() // NoticeRepository 객체 생성
+    private var receiver: BroadcastReceiver? = null// BroadcastReceiver 멤버 변수 추가
 
-    // 각각의 공지사항 데이터를 담는 상태 플로우 / API 요청 중 발생한 오류
-    // 일반 공지사항
-    private val _generalNotices = MutableStateFlow<List<Notice>>(emptyList())
-    val generalNotices: StateFlow<List<Notice>> = _generalNotices
+    // 현재 선택된 타입을 관리하는 StateFlow
+    private val _currentType = MutableStateFlow("home")
+    val currentType: StateFlow<String> get() = _currentType
 
-    private val _generalError = MutableStateFlow<String?>(null)
-    val generalError: StateFlow<String?> = _generalError
-// --------------------------------------------------------------------------------
-    // 장학 공지사항
-    private val _scholarshipNotices = MutableStateFlow<List<Notice>>(emptyList())
-    val scholarshipNotices: StateFlow<List<Notice>> = _scholarshipNotices
+    // 각각의 공지사항 데이터를 담는 상태 플로우 및 오류 상태
+    private val noticeStateMap = mutableMapOf(
+        "general" to NoticeState(),
+        "scholarship" to NoticeState(),
+        "dormitory" to NoticeState(),
+        "department_ece" to NoticeState(),
+        "department_aisemi" to NoticeState()
+    )
 
-    private val _scholarshipError = MutableStateFlow<String?>(null)
-    val scholarshipError: StateFlow<String?> = _scholarshipError
-// --------------------------------------------------------------------------------
-    // 생활관 공지사항
-    private val _dormitoryNotices = MutableStateFlow<List<Notice>>(emptyList())
-    val dormitoryNotices: StateFlow<List<Notice>> = _dormitoryNotices
+    // getter: 외부에서 StateFlow로 접근
+    val generalNotices: StateFlow<List<Notice>> get() = noticeStateMap["general"]!!.notices
+    val generalError: StateFlow<String?> get() = noticeStateMap["general"]!!.error
+    val scholarshipNotices: StateFlow<List<Notice>> get() = noticeStateMap["scholarship"]!!.notices
+    val scholarshipError: StateFlow<String?> get() = noticeStateMap["scholarship"]!!.error
+    val dormitoryNotices: StateFlow<List<Notice>> get() = noticeStateMap["dormitory"]!!.notices
+    val dormitoryError: StateFlow<String?> get() = noticeStateMap["dormitory"]!!.error
+    val eceNotices: StateFlow<List<Notice>> get() = noticeStateMap["department_ece"]!!.notices
+    val eceError: StateFlow<String?> get() = noticeStateMap["department_ece"]!!.error
+    val aiSemiNotices: StateFlow<List<Notice>> get() = noticeStateMap["department_aisemi"]!!.notices
+    val aiSemiError: StateFlow<String?> get() = noticeStateMap["department_aisemi"]!!.error
 
-    private val _dormitoryError = MutableStateFlow<String?>(null)
-    val dormitoryError: StateFlow<String?> = _dormitoryError
-// --------------------------------------------------------------------------------
-    // 전자공학과 공지사항
-    private val _eceNotices = MutableStateFlow<List<Notice>>(emptyList())
-    val eceNotices: StateFlow<List<Notice>> = _eceNotices
-
-    private val _eceError = MutableStateFlow<String?>(null)
-    val eceError: StateFlow<String?> = _eceError
-// --------------------------------------------------------------------------------
-    // 지능형반도체공학과 공지사항
-    private val _aiSemiNotices = MutableStateFlow<List<Notice>>(emptyList())
-    val aiSemiNotices: StateFlow<List<Notice>> = _aiSemiNotices
-
-    private val _aiSemiError = MutableStateFlow<String?>(null)
-    val aiSemiError: StateFlow<String?> = _aiSemiError
-
-
-    // 초기화 시 데이터 가져오기
     init {
         fetchAllNotices()
     }
 
-    // 1) 앱 실행하면 모든 공지사항을 불러옴
     fun fetchAllNotices() {
-        viewModelScope.launch {
-            // 일반 공지사항
-            try {
-                _generalNotices.value = repository.getGeneralNotices()
-            } catch (e: Exception) {
-                _generalError.value = e.message
-            }
-
-            // 장학 공지사항
-            try {
-                _scholarshipNotices.value = repository.getScholarshipNotices()
-            } catch (e: Exception) {
-                _scholarshipError.value = e.message
-            }
-
-            // 생활관 공지사항
-            try {
-                _dormitoryNotices.value = repository.getDormitoryNotices()
-            } catch (e: Exception) {
-                _dormitoryError.value = e.message
-            }
-
-            // 전자공학과 공지사항
-            try {
-                _eceNotices.value = repository.getECENotices()
-            } catch (e: Exception) {
-                _eceError.value = e.message
-            }
-
-            // 지능형반도체공학과 공지사항
-            try {
-                _aiSemiNotices.value = repository.getAiSemiNotices()
-            } catch (e: Exception) {
-                _aiSemiError.value = e.message
-            }
+        noticeStateMap.keys.forEach { type ->
+            refreshNotices(type) {}
         }
     }
 
-    // 2) 알림 클릭 or PullToRefresh 시 “일반 공지”만 다시 로드
     fun refreshNotices(type: String, onComplete: (Boolean) -> Unit) {
         viewModelScope.launch {
+            val state = noticeStateMap[type] ?: return@launch
             try {
-                val newNotices = when (type) {
-                    "general" -> repository.getGeneralNotices()
-                    "scholarship" -> repository.getScholarshipNotices()
-                    "dormitory" -> repository.getDormitoryNotices()
-                    "department_ece" -> repository.getECENotices()
-                    "department_aisemi" -> repository.getAiSemiNotices()
-                    else -> emptyList()
-                }
-                // 변경사항 확인
-                val hasChanges = when (type) {
-                    "general" -> newNotices != _generalNotices.value
-                    "scholarship" -> newNotices != _scholarshipNotices.value
-                    "dormitory" -> newNotices != _dormitoryNotices.value
-                    "department_ece" -> newNotices != _eceNotices.value
-                    "department_aisemi" -> newNotices != _aiSemiNotices.value
-                    else -> false
-                }
-                // 변경사항이 있으면 상태 갱신
+                val newNotices = fetchNoticesByType(type)
+                val hasChanges = newNotices != state.notices.value
                 if (hasChanges) {
-                    when (type) {
-                        "general" -> _generalNotices.value = newNotices
-                        "scholarship" -> _scholarshipNotices.value = newNotices
-                        "dormitory" -> _dormitoryNotices.value = newNotices
-                        "department_ece" -> _eceNotices.value = newNotices
-                        "department_aisemi" -> _aiSemiNotices.value = newNotices
-                    }
+                    state.notices.value = newNotices
                 }
-                onComplete(hasChanges) // 로드 완료 후 호출
+                onComplete(hasChanges)
             } catch (e: Exception) {
-                onComplete(false) // 에러 발생 시에도 호출
+                state.error.value = e.message
+                onComplete(false)
             }
         }
     }
+
+    private suspend fun fetchNoticesByType(type: String): List<Notice> {
+        return when (type) {
+            "general" -> repository.getGeneralNotices()
+            "scholarship" -> repository.getScholarshipNotices()
+            "dormitory" -> repository.getDormitoryNotices()
+            "department_ece" -> repository.getECENotices()
+            "department_aisemi" -> repository.getAiSemiNotices()
+            else -> emptyList()
+        }
+    }
+
+    fun updateNoticeType(type: String) {
+        _currentType.value = type
+        Log.d("NoticeViewModel", "Notice type updated to: $type")
+    }
+
+    // LocalBroadcastManager 등록 및 해제
+    fun registerBroadcastReceiver(context: Context) {
+        receiver = object : BroadcastReceiver() { // 클래스 멤버 변수 receiver에 할당
+            override fun onReceive(context: Context, intent: Intent) {
+                val type = intent.getStringExtra("noticeType") ?: return
+                Log.d("NoticeViewModel", "BroadcastReceiver 수신 - type: $type")
+                refreshNotices(type) {}
+                updateNoticeType(type) // ViewModel의 타입 업데이트
+            }
+        }
+        LocalBroadcastManager.getInstance(context)
+            .registerReceiver(receiver!!, IntentFilter("ACTION_REFRESH_NOTICES"))
+        Log.d("NoticeViewModel", "BroadcastReceiver 등록 완료")
+    }
+
+    fun unregisterBroadcastReceiver(context: Context) {
+        receiver?.let {
+            LocalBroadcastManager.getInstance(context).unregisterReceiver(it)
+            Log.d("NoticeViewModel", "BroadcastReceiver 해제 완료")
+        }
+    }
+
+    private class NoticeState(
+        val notices: MutableStateFlow<List<Notice>> = MutableStateFlow(emptyList()),
+        val error: MutableStateFlow<String?> = MutableStateFlow(null)
+    )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

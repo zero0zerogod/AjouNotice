@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.scheschedule"> <!-- 패키지 이름 추가 -->
 
@@ -8,6 +9,8 @@
     <!-- 알림 권한 추가 -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- 셀 방송 수신 권한 추가 -->
+    <uses-permission android:name="android.permission.READ_CELL_BROADCASTS" />
 
     <application
         android:allowBackup="true"
@@ -22,12 +25,14 @@
         android:theme="@style/Theme.ScheSchedule"
         android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
+
         <!-- MainActivity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.ScheSchedule">
+            android:theme="@style/Theme.ScheSchedule"
+            android:launchMode="singleTask"> <!-- launchMode 추가 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
