@@ -91,6 +91,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(platform(libs.androidx.compose.bom.v20250100))
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.material)
+
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
@@ -127,4 +133,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     // OkHttp Logging Interceptor 추가
     implementation(libs.logging.interceptor)
+
 }
