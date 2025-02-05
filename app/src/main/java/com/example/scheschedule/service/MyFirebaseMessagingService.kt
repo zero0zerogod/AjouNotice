@@ -70,9 +70,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
-        // requestCode를 0으로 통일하여 항상 FLAG_UPDATE_CURRENT로 갱신
+        // 🔥 [수정됨] PendingIntent.FLAG_MUTABLE 추가 (Android 12 이상에서 Intent 전달 문제 해결)
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         )
 
         // 알림 생성 및 표시
