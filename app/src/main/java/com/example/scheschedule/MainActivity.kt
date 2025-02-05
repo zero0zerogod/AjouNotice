@@ -90,6 +90,9 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
+        // 🔥 [수정됨] 기존 Intent를 새 Intent로 업데이트하여 올바른 데이터가 반영되도록 함
+        setIntent(intent)
+
         // 알림 클릭 등으로 새 Intent가 들어왔을 때
         val newType = intent.getStringExtra("noticeType") ?: "home"
         Log.d(TAG, "onNewIntent: 새로운 알림 타입 - $newType")
@@ -161,8 +164,6 @@ fun MainScreen(navController: NavHostController, currentType: String) {
         // 이미 같은 라우트면 navigate를 호출하지 않아도 됨
         if (currentRoute != destination) {
             navController.navigate(destination) {
-                // 기존에 inclusive=true로 startDestination까지 날려버리면 계속 home->home으로 보이는 상황 가능
-                // 필요 시 popUpTo → inclusive=false 로 조정
                 popUpTo(navController.graph.startDestinationId) {
                     inclusive = false
                 }
