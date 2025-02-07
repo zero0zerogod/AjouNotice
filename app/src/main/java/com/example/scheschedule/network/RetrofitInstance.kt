@@ -8,16 +8,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
     // Retrofit 인스턴스 생성
-    val api: NoticeApi by lazy {
+    val api: Api by lazy {
         createRetrofitInstance()
     }
 
-    private fun createRetrofitInstance(): NoticeApi {
+    private fun createRetrofitInstance(): Api {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.API_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(NoticeApi::class.java)
+            .create(Api::class.java)
     }
 
 }

@@ -1,21 +1,62 @@
 package com.example.scheschedule.ui.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import android.annotation.SuppressLint
+import android.os.Build
+import android.webkit.JavascriptInterface
+import android.webkit.WebViewClient
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.scheschedule.viewmodel.AjouScheduleViewModel
+import com.example.scheschedule.widget.WrapContentWebView
 
-// 홈 화면 UI를 정의하는 Composable 함수
+@RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun HomeScreen() {
-    // Box: 단일 레이아웃 컨테이너로, 자식 view를 배치하고 스타일링할 수 있음
-    Box(
-        modifier = Modifier.fillMaxSize(), // Box가 화면 전체를 채우도록 설정
-        contentAlignment = Alignment.Center // 자식 view를 박스 중앙에 정렬
-    ) {
-        // 중앙에 텍스트 표시
-        Text(text = "Home Screen") // 화면 중앙에 "Home Screen" 텍스트 출력
+fun HomeScreen(
+    scheduleViewModel: AjouScheduleViewModel = viewModel()
+) {
+    val scheduleHtml by scheduleViewModel.scheduleHtml.collectAsState()
+    val scrollState = rememberScrollState()
+    val context = LocalContext.current
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(16.dp)
+        ) {
+            // ✅ 웹뷰 추가 (항상 표시)
+            AndroidView(factory = { context ->
+                WrapContentWebView(context).apply {
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    webViewClient = object : WebViewClient() {}
+
+                    addJavascriptInterface(object {
+                        @JavascriptInterface
+                        fun changeYear(newYear: Int) {
+                            scheduleViewModel.loadSchedule(newYear)
+                        }
+                    }, "Android")
+
+                    loadDataWithBaseURL(
+                        "https://www.ajou.ac.kr/", scheduleHtml, "text/html", "UTF-8", null
+                    )
+                }
+            }, update = { webView ->
+                webView.loadDataWithBaseURL(
+                    "https://www.ajou.ac.kr/", scheduleHtml, "text/html", "UTF-8", null
+                )
+            })
+        }
     }
 }

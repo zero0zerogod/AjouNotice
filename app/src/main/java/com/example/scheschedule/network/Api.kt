@@ -2,8 +2,11 @@ package com.example.scheschedule.network
 
 import com.example.scheschedule.model.Notice
 import retrofit2.http.GET
+import retrofit2.http.Query
+import okhttp3.ResponseBody
+import retrofit2.Response
 
-interface NoticeApi {
+interface Api {
     @GET("api/notices/general")
     suspend fun getGeneralNotices(): List<Notice>
 
@@ -18,4 +21,7 @@ interface NoticeApi {
 
     @GET("api/notices/department_aisemi")
     suspend fun getAiSemiNotices(): List<Notice>
+
+    @GET("api/ajou_schedule")
+    suspend fun getScheduleHtml(@Query("year") year: Int): Response<ResponseBody>
 }

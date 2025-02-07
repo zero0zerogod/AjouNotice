@@ -1,4 +1,4 @@
-package com.example.scheschedule.ui.viewmodel
+package com.example.scheschedule.viewmodel
 
 import android.content.BroadcastReceiver
 import android.content.Context

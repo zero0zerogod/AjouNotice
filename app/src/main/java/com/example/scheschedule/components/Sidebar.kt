@@ -279,7 +279,7 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                 Icon(Icons.Default.Settings, contentDescription = "Settings")
             }
 
-            SidebarButton("About", navController, "info", drawerState, scope) {
+            SidebarButton("About", navController, "developer", drawerState, scope) {
                 Icon(Icons.Default.Info, contentDescription = "Information")
             }
         }
