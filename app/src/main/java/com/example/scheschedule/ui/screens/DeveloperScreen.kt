@@ -3,25 +3,43 @@ package com.example.scheschedule.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.scheschedule.viewmodel.DeveloperViewModel
 
 @Composable
-fun DeveloperScreen() {
+fun DeveloperScreen(
+    developerViewModel: DeveloperViewModel
+) {
+    val developerInfo by developerViewModel.developerInfo.collectAsState()
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
@@ -51,17 +69,17 @@ fun DeveloperScreen() {
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
-                    DeveloperInfoItem("정영신")
-                    DeveloperInfoItem("소속: 아주대학교 전자공학과 23학번")
-                    DeveloperInfoItem("학년: 3학년 1학기 재학 중")
-                    DeveloperInfoItem("활동: 설회 프로그래밍 부서 부장")
+                    DeveloperInfoItem("이름: ${developerInfo.name}")
+                    DeveloperInfoItem("소속: ${developerInfo.department}")
+                    DeveloperInfoItem("학년: ${developerInfo.grade}")
+                    DeveloperInfoItem("역할: ${developerInfo.role}")
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // 이메일 정보 (복사 가능)
                     SelectionContainer {
                         Text(
-                            text = "E-mail: origami0352@ajou.ac.kr",
+                            text = "E-mail: ${developerInfo.email}",
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(vertical = 4.dp)
@@ -73,29 +91,25 @@ fun DeveloperScreen() {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        OutlinedButton(
-                            onClick = {
-                                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                                    data = Uri.parse("mailto:origami0352@ajou.ac.kr")
-                                    putExtra(Intent.EXTRA_SUBJECT, "[피드백] 앱 관련 문의")
-                                }
-                                context.startActivity(emailIntent)
+                        OutlinedButton(onClick = {
+                            val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = Uri.parse("mailto:${developerInfo.email}")
+                                putExtra(Intent.EXTRA_SUBJECT, "[피드백] 앱 관련 문의")
                             }
-                        ) {
+                            context.startActivity(emailIntent)
+                        }) {
                             Icon(Icons.Default.Email, contentDescription = "Email")
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(text = "이메일 보내기")
                         }
 
-                        OutlinedButton(
-                            onClick = {
-                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_TEXT, "아주대학교 정보통신대학 공지사항 앱을 확인해보세요! 🚀")
-                                }
-                                context.startActivity(Intent.createChooser(shareIntent, "앱 공유하기"))
+                        OutlinedButton(onClick = {
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, "아주대학교 정보통신대학 공지사항 앱을 확인해보세요! 🚀")
                             }
-                        ) {
+                            context.startActivity(Intent.createChooser(shareIntent, "앱 공유하기"))
+                        }) {
                             Icon(Icons.Default.Share, contentDescription = "Share")
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(text = "앱 공유")
@@ -171,17 +185,13 @@ fun DeveloperScreen() {
 @Composable
 fun DeveloperInfoItem(info: String) {
     Text(
-        text = info,
-        fontSize = 18.sp,
-        modifier = Modifier.padding(vertical = 2.dp)
+        text = info, fontSize = 18.sp, modifier = Modifier.padding(vertical = 2.dp)
     )
 }
 
 @Composable
 fun AppDescriptionText(text: String) {
     Text(
-        text = text,
-        fontSize = 16.sp,
-        modifier = Modifier.padding(vertical = 4.dp)
+        text = text, fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp)
     )
 }

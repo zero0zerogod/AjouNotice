@@ -8,6 +8,7 @@ composeFontawesomeIcons = "<latest-version>"
 converterGson = "2.9.0"
 espressoCoreVersion = "3.5.1"
 firebaseBom = "33.8.0"
+firebaseFirestoreKtx = "25.1.2"
 githubComposeFontawesomeIcons = "1.0.1"
 googleAccompanistIcon = "0.26.0"
 kotlin = "2.0.0"
@@ -46,6 +47,7 @@ compose-fontawesome-icons-v101 = { module = "com.github.SmartToolFactory:compose
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 google-accompanist-icon = { module = "com.google.accompanist:accompanist-icon", version.ref = "googleAccompanistIcon" }
 google-accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

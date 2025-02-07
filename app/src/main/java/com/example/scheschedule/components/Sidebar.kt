@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.ExpandLess
@@ -34,7 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -62,11 +63,8 @@ fun SidebarButton(
         },
         modifier = Modifier
             .fillMaxWidth() // 버튼이 사이드바의 가로를 완전히 채우도록 설정
-            .height(48.dp), // 버튼의 높이를 고정하여 균일한 크기 유지
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer, // ✅ 버튼 배경 색상 변경
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer // ✅ 텍스트 색상 변경
-        ),
+            .height(48.dp) // 버튼의 높이를 고정하여 균일한 크기 유지
+            .shadow(6.dp), // 🔥 그림자 추가
         shape = Shapes().small.copy(CornerSize(0.dp)) // 버튼 모서리를 직각으로 설정
     ) {
         Row(
@@ -104,9 +102,10 @@ fun SubSidebarButton(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
-            .padding(start = 0.dp),
+            .padding(start = 0.dp)
+            .shadow(4.dp), // 🔥 그림자 추가
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant, // ✅ 버튼 배경 색상 변경
+            containerColor = MaterialTheme.colorScheme.primaryContainer, // ✅ 버튼 배경 색상 변경
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer // ✅ 텍스트 색상 변경
         ),
         shape = Shapes().small.copy(CornerSize(0.dp)) // 버튼 모서리를 직각으로 설정
@@ -147,7 +146,7 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
         modifier = Modifier
             .fillMaxHeight() // 화면의 세로를 모두 채우도록 설정
             .width(270.dp) // 사이드바의 가로 크기를 270dp로 고정
-            .background(color = MaterialTheme.colorScheme.secondaryContainer) // 사이드바의 배경색을 연회색으로 설정
+            .background(color = MaterialTheme.colorScheme.primaryContainer) // 사이드바의 배경색을 연회색으로 설정
             .padding(vertical = 16.dp) // 내부 수직 패딩 추가
     ) {
         // 버튼을 세로로 배치하기 위한 Column
@@ -172,11 +171,8 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
-                    .padding(start = 0.dp), // 왼쪽 정렬 유지
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer, // ✅ 버튼 배경 색상 변경
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer // ✅ 텍스트 색상 변경
-                ),
+                    .padding(start = 0.dp) // 왼쪽 정렬 유지
+                    .shadow(4.dp), // 🔥 그림자 추가
                 shape = Shapes().small.copy(CornerSize(0.dp))
             ) {
                 Row(
@@ -233,12 +229,9 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
-                        .padding(start = 0.dp), // 생활관 공지사항 아래에 배치
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer, // ✅ 버튼 배경 색상 변경
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer // ✅ 텍스트 색상 변경
-                    ),
-                    shape = Shapes().small.copy(CornerSize(0.dp))
+                        .padding(start = 0.dp) // 생활관 공지사항 아래에 배치
+                        .shadow(4.dp), // 🔥 그림자 추가
+                shape = Shapes().small.copy(CornerSize(0.dp))
                 ) {
                     Row(
                         modifier = Modifier
