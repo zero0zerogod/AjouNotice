@@ -37,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.scheschedule.components.Sidebar
 import com.example.scheschedule.navigation.NavGraph
 import com.example.scheschedule.ui.theme.ScheScheduleTheme
+import com.example.scheschedule.viewmodel.DeveloperViewModel
 import com.example.scheschedule.viewmodel.NoticeViewModel
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
@@ -48,6 +49,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private val viewModel: NoticeViewModel by viewModels()
+    private val developerViewModel: DeveloperViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +61,7 @@ class MainActivity : ComponentActivity() {
         // FCM 알림에서 전달된 noticeType 처리
         val initialType = intent?.getStringExtra("noticeType") ?: "home"
         viewModel.updateNoticeType(initialType)
-        Log.d(TAG, "onCreate: 알림 타입 - $initialType") // 알림 타입 확인
+        developerViewModel.fetchDeveloperInfo() // 🔥 앱 실행과 동시에 Firestore 데이터 미리 불러오기
 
         // BroadcastReceiver 등록
         viewModel.registerBroadcastReceiver(this)
@@ -80,7 +82,7 @@ class MainActivity : ComponentActivity() {
                 val currentType = currentTypeState.value
                 Log.d(TAG, "onCreate: 알림 타입 - $currentTypeState")
 
-                MainScreen(navController = navController, currentType = currentType)
+                MainScreen(navController = navController, currentType = currentType, developerViewModel = developerViewModel)
             }
         }
 
@@ -142,7 +144,7 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController, currentType: String) {
+fun MainScreen(navController: NavHostController, currentType: String, developerViewModel: DeveloperViewModel) {
     // 사이드바의 초기 상태 설정 (닫힌 상태)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope() // 코루틴 스코프 생성
@@ -194,7 +196,7 @@ fun MainScreen(navController: NavHostController, currentType: String) {
                     .padding(innerPadding)
             ) {
                 Log.d("MainScreen", "Scaffold: NavGraph 설정 시작")
-                NavGraph(navController = navController)
+                NavGraph(navController = navController, developerViewModel = developerViewModel)
             }
         })
     }

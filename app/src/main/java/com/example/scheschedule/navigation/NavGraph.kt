@@ -15,10 +15,11 @@ import com.example.scheschedule.ui.screens.notice.DormitoryNoticeScreen
 import com.example.scheschedule.ui.screens.notice.ECENoticeScreen
 import com.example.scheschedule.ui.screens.notice.GeneralNoticeScreen
 import com.example.scheschedule.ui.screens.notice.ScholarshipNoticeScreen
+import com.example.scheschedule.viewmodel.DeveloperViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(navController: NavHostController, developerViewModel: DeveloperViewModel) {
     NavHost(
         navController = navController, startDestination = "home"
     ) {
@@ -33,6 +34,6 @@ fun NavGraph(navController: NavHostController) {
         composable("notice/department_ece") { ECENoticeScreen() }
         composable("notice/department_aisemi") { AiSemiNoticeScreen() }
 
-        composable("developer") { DeveloperScreen() }
+        composable("developer") { DeveloperScreen(developerViewModel = developerViewModel) }
     }
 }
