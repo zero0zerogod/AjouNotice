@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Home
@@ -22,10 +21,11 @@ import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,9 +59,14 @@ fun SidebarButton(
                 drawerState.close() // 버튼 클릭 시 사이드바를 닫음
             }
             navController.navigate(route) // 지정된 네비게이션 경로로 이동
-        }, modifier = Modifier
+        },
+        modifier = Modifier
             .fillMaxWidth() // 버튼이 사이드바의 가로를 완전히 채우도록 설정
             .height(48.dp), // 버튼의 높이를 고정하여 균일한 크기 유지
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer, // ✅ 버튼 배경 색상 변경
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer // ✅ 텍스트 색상 변경
+        ),
         shape = Shapes().small.copy(CornerSize(0.dp)) // 버튼 모서리를 직각으로 설정
     ) {
         Row(
@@ -100,6 +105,10 @@ fun SubSidebarButton(
             .fillMaxWidth()
             .height(48.dp)
             .padding(start = 0.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant, // ✅ 버튼 배경 색상 변경
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer // ✅ 텍스트 색상 변경
+        ),
         shape = Shapes().small.copy(CornerSize(0.dp)) // 버튼 모서리를 직각으로 설정
     ) {
         Row(
@@ -138,7 +147,7 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
         modifier = Modifier
             .fillMaxHeight() // 화면의 세로를 모두 채우도록 설정
             .width(270.dp) // 사이드바의 가로 크기를 270dp로 고정
-            .background(Color.LightGray) // 사이드바의 배경색을 연회색으로 설정
+            .background(color = MaterialTheme.colorScheme.secondaryContainer) // 사이드바의 배경색을 연회색으로 설정
             .padding(vertical = 16.dp) // 내부 수직 패딩 추가
     ) {
         // 버튼을 세로로 배치하기 위한 Column
@@ -149,9 +158,13 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
             SidebarButton("홈", navController, "home", drawerState, scope) {
                 Icon(Icons.Default.Home, contentDescription = "Home Icon") // 아이콘 추가
             }
-            SidebarButton("시간표", navController, "schedule", drawerState, scope) {
-                Icon(Icons.Default.CalendarToday, contentDescription = "Home Icon")
-            }
+            SidebarButton("주요 서비스", navController, "service", drawerState, scope, icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.global),
+                    contentDescription = "Service Icon",
+                    modifier = Modifier.size(24.dp), // 아이콘 크기
+                )
+            })
 
             // 공지사항 버튼
             Button(
@@ -160,6 +173,10 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                     .fillMaxWidth()
                     .height(48.dp)
                     .padding(start = 0.dp), // 왼쪽 정렬 유지
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer, // ✅ 버튼 배경 색상 변경
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer // ✅ 텍스트 색상 변경
+                ),
                 shape = Shapes().small.copy(CornerSize(0.dp))
             ) {
                 Row(
@@ -217,6 +234,10 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                         .fillMaxWidth()
                         .height(48.dp)
                         .padding(start = 0.dp), // 생활관 공지사항 아래에 배치
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer, // ✅ 버튼 배경 색상 변경
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer // ✅ 텍스트 색상 변경
+                    ),
                     shape = Shapes().small.copy(CornerSize(0.dp))
                 ) {
                     Row(
@@ -272,11 +293,6 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                         paddingStart = 64
                     )
                 }
-            }
-
-
-            SidebarButton("설정", navController, "settings", drawerState, scope) {
-                Icon(Icons.Default.Settings, contentDescription = "Settings")
             }
 
             SidebarButton("About", navController, "developer", drawerState, scope) {
