@@ -2,10 +2,10 @@ package com.example.scheschedule.ui.screens.notice
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -36,7 +36,7 @@ fun NoticeListScreen(
     viewModel: NoticeViewModel,
     type: String
 ) {
-    // Snackbar & PullRefresh
+    // ✅ Snackbar & PullRefresh
     val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
@@ -58,21 +58,21 @@ fun NoticeListScreen(
         }
     )
 
-    // 고정 공지사항 토글, 페이징, 스크롤
+    // ✅ 고정 공지사항 토글, 페이징, 스크롤
     var fixedExpanded by remember { mutableStateOf(true) }
     var currentPage by remember { mutableIntStateOf(1) }
     val scrollState = rememberScrollState()
 
-    // 페이지 변경 시 스크롤 최상단 이동
+    // ✅ 페이지 변경 시 스크롤 최상단 이동
     LaunchedEffect(currentPage) {
         scrollState.animateScrollTo(0)
     }
 
-    // 고정 vs 일반 공지
+    // ✅ 고정 vs 일반 공지
     val fixedNotices = notices.filter { it.number == "공지" }
     val generalNotices = notices.filter { it.number != "공지" }
 
-    // 일반 공지 페이징(한 페이지 10개)
+    // ✅ 일반 공지 페이징(한 페이지 10개)
     val totalPages = if (generalNotices.isEmpty()) 1 else ceil(generalNotices.size / 10.0).toInt()
     val startIndex = (currentPage - 1) * 10
     val currentGeneralNotices = generalNotices.drop(startIndex).take(10)
@@ -88,7 +88,7 @@ fun NoticeListScreen(
                 .verticalScroll(scrollState)
                 .padding(16.dp)
         ) {
-            // 화면 제목 + new 표시
+            // ✅ 화면 제목 + new 표시
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = title,
@@ -103,8 +103,8 @@ fun NoticeListScreen(
                 }
             }
 
-            // 에러 메시지 표시
-            if (error != null) {
+            // ✅ 에러 메시지 표시
+            error?.let {
                 Text(
                     text = "에러 발생: $error",
                     color = Color.Red,
@@ -112,155 +112,117 @@ fun NoticeListScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // 고정 공지사항 영역 (헤더 + 행들까지 전체 배경)
-            if (fixedExpanded) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFE0E0E0))  // 라이트 그레이
-                        .padding(8.dp)
+            // ✅ 고정 공지사항 영역 (카드 스타일)
+            if (fixedNotices.isNotEmpty()) {
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                    elevation = CardDefaults.elevatedCardElevation(4.dp)
                 ) {
-                    // 고정 공지사항 헤더(색 포함)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { fixedExpanded = !fixedExpanded }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "고정 공지사항",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = "닫기",
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    }
-
-                    // 고정 공지사항 각 행
-                    fixedNotices.forEachIndexed { i, notice ->
-                        NoticeRow(notice)
-                        // 행 사이에만 구분선, 마지막 행 아래는 공백 최소화
-                        if (i < fixedNotices.size - 1) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 4.dp),
-                                thickness = 1.dp,
-                                color = Color.LightGray
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { fixedExpanded = !fixedExpanded }
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "📌 고정 공지사항",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer, // ✅ 대비 최적화된 텍스트 색상 적용
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.weight(1f)
                             )
+                            Text(
+                                text = if (fixedExpanded) "▲ 닫기" else "▼ 열기",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer, // ✅ 대비 색상 자동 조정
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                        }
+                        if (fixedExpanded) {
+                            fixedNotices.forEach { notice ->
+                                NoticeRow(notice)
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(vertical = 4.dp),
+                                    thickness = 1.dp
+                                )
+                            }
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-            } else {
-                // 닫힌 상태 헤더 (색 없음)
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { fixedExpanded = !fixedExpanded }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "고정 공지사항",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = "열기",
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    }
-                }
-                // 닫힌 상태 → 라이트 그레이 없이 바로 아래 일반 공지로
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
             }
 
-            // 일반 공지사항
-            currentGeneralNotices.forEachIndexed { i, notice ->
-                NoticeRow(notice)
-                // 행 사이에만 구분선
-                if (i < currentGeneralNotices.size - 1) {
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 4.dp),
-                        thickness = 1.dp
-                    )
+            // ✅ 일반 공지사항 리스트
+            currentGeneralNotices.forEach { notice ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest), // 🔥 일반 공지사항은 밝게
+                    elevation = CardDefaults.elevatedCardElevation(4.dp)
+                ) {
+                    NoticeRow(notice)
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 페이징 영역
-            if (generalNotices.isNotEmpty()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    if (currentPage > 1) {
-                        Text(
-                            text = "◀",
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .clickable { currentPage-- },
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    for (page in 1..totalPages) {
-                        Text(
-                            text = page.toString(),
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .clickable { currentPage = page },
-                            fontSize = 16.sp,
-                            fontWeight = if (page == currentPage) FontWeight.Bold else FontWeight.Normal,
-                            color = if (page == currentPage) MaterialTheme.colorScheme.primary else Color.Gray
-                        )
-                    }
-                    if (currentPage < totalPages) {
-                        Text(
-                            text = "▶",
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .clickable { currentPage++ },
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
+            // ✅ 기존 스타일의 페이징 UI 유지 (단순한 텍스트 UI)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                if (currentPage > 1) {
+                    Text(
+                        text = "◀",
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable { currentPage-- },
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                for (page in 1..totalPages) {
+                    Text(
+                        text = page.toString(),
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable { currentPage = page },
+                        fontSize = 16.sp,
+                        fontWeight = if (page == currentPage) FontWeight.Bold else FontWeight.Normal,
+                        color = if (page == currentPage) MaterialTheme.colorScheme.primary else Color.Gray
+                    )
+                }
+                if (currentPage < totalPages) {
+                    Text(
+                        text = "▶",
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable { currentPage++ },
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // PullRefresh
         PullRefreshIndicator(
             refreshing = isRefreshing,
             state = pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter),
-            backgroundColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.primary
+            modifier = Modifier.align(Alignment.TopCenter)
         )
 
-        // Snackbar
         SnackbarHost(
             hostState = snackBarHostState,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
-        ) { data ->
-            Snackbar(snackbarData = data)
-        }
+        )
     }
 }

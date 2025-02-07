@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.scheschedule.ui.screens.DeveloperScreen
 import com.example.scheschedule.ui.screens.HomeScreen
-import com.example.scheschedule.ui.screens.ScheduleScreen
+import com.example.scheschedule.ui.screens.ServiceScreen
 import com.example.scheschedule.ui.screens.SettingsScreen
 import com.example.scheschedule.ui.screens.notice.AiSemiNoticeScreen
 import com.example.scheschedule.ui.screens.notice.DormitoryNoticeScreen
@@ -23,7 +23,7 @@ fun NavGraph(navController: NavHostController) {
         navController = navController, startDestination = "home"
     ) {
         composable("home") { HomeScreen() }
-        composable("schedule") { ScheduleScreen() }
+        composable("service") { ServiceScreen() }
         composable("settings") { SettingsScreen() }
 
         // 공지사항 종류별 라우트 추가
