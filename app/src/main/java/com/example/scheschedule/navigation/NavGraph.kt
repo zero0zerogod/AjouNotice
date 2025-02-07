@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.scheschedule.ui.screens.AppInfoScreen
+import com.example.scheschedule.ui.screens.DeveloperScreen
 import com.example.scheschedule.ui.screens.HomeScreen
 import com.example.scheschedule.ui.screens.ScheduleScreen
 import com.example.scheschedule.ui.screens.SettingsScreen
@@ -33,6 +33,6 @@ fun NavGraph(navController: NavHostController) {
         composable("notice/department_ece") { ECENoticeScreen() }
         composable("notice/department_aisemi") { AiSemiNoticeScreen() }
 
-        composable("info") { AppInfoScreen() }
+        composable("developer") { DeveloperScreen() }
     }
 }

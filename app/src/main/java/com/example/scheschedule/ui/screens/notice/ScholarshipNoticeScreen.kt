@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.scheschedule.ui.viewmodel.NoticeViewModel
-import com.example.scheschedule.ui.viewmodel.hasRecentNotices
+import com.example.scheschedule.viewmodel.NoticeViewModel
+import com.example.scheschedule.viewmodel.hasRecentNotices
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

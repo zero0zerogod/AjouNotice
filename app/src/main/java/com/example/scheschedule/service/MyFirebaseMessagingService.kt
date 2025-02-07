@@ -22,13 +22,27 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(remoteMessage)
 
         // 데이터 payload 예: {"type": "general"}
-        val type = remoteMessage.data["type"] ?: "home"
+        val type = remoteMessage.data["type"] ?: "general"
         Log.d("MyFirebaseMessagingService", "수신한 타입: $type")
+        val rawBody = remoteMessage.data["body"] ?: "공지사항 내용이 없습니다."
+
+        // 한국어 타입 변환 매핑
+        val typeInKorean = when (type) {
+            "general" -> "일반"
+            "scholarship" -> "장학"
+            "dormitory" -> "생활관"
+            "department_ece" -> "전자공학과"
+            "department_aisemi" -> "지능형반도체공학과"
+            else -> "기타"
+        }
 
         // 알림 메시지가 있으면 제목/내용 설정
-        val noti = remoteMessage.notification
-        val title = noti?.title ?: "새 공지사항"
-        val body = noti?.body ?: "[$type] 공지가 등록되었습니다."
+        // val noti = remoteMessage.notification
+        val title = "[$typeInKorean] 새로운 공지사항이 게시되었습니다."
+        val body = "\"$rawBody\""
+
+        Log.d("MyFirebaseMessagingService", "수신한 타입: $type -> $typeInKorean")
+        Log.d("MyFirebaseMessagingService", "수정된 알림: $title - $body")
 
         // 실제 알림 생성
         sendNotification(title, body, type)

@@ -37,7 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.scheschedule.components.Sidebar
 import com.example.scheschedule.navigation.NavGraph
 import com.example.scheschedule.ui.theme.ScheScheduleTheme
-import com.example.scheschedule.ui.viewmodel.NoticeViewModel
+import com.example.scheschedule.viewmodel.NoticeViewModel
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 

@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scheschedule.components.NoticeRow
 import com.example.scheschedule.model.Notice
-import com.example.scheschedule.ui.viewmodel.NoticeViewModel
+import com.example.scheschedule.viewmodel.NoticeViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
