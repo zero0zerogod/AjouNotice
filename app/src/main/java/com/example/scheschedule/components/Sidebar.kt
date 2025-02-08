@@ -12,9 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Home
@@ -60,8 +60,7 @@ fun SidebarButton(
                 drawerState.close() // 버튼 클릭 시 사이드바를 닫음
             }
             navController.navigate(route) // 지정된 네비게이션 경로로 이동
-        },
-        modifier = Modifier
+        }, modifier = Modifier
             .fillMaxWidth() // 버튼이 사이드바의 가로를 완전히 채우도록 설정
             .height(48.dp) // 버튼의 높이를 고정하여 균일한 크기 유지
             .shadow(6.dp), // 🔥 그림자 추가
@@ -192,7 +191,8 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
             }
             // 사용 예시
             if (isNoticeExpanded.value) {
-                SubSidebarButton("일반 공지사항",
+                SubSidebarButton(
+                    "일반 공지사항",
                     navController,
                     "notice/general",
                     drawerState,
@@ -203,10 +203,11 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                             contentDescription = "General Icon",
                             modifier = Modifier
                                 .size(22.dp)
-                                .padding(start=1.dp, end = 1.dp)
+                                .padding(start = 1.dp, end = 1.dp)
                         )
                     })
-                SubSidebarButton("장학 공지사항",
+                SubSidebarButton(
+                    "장학 공지사항",
                     navController,
                     "notice/scholarship",
                     drawerState,
@@ -214,7 +215,8 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                     icon = {
                         Icon(Icons.Default.School, contentDescription = "Scholarship Icon")
                     })
-                SubSidebarButton("생활관 공지사항",
+                SubSidebarButton(
+                    "생활관 공지사항",
                     navController,
                     "notice/dormitory",
                     drawerState,
@@ -231,7 +233,7 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                         .height(48.dp)
                         .padding(start = 0.dp) // 생활관 공지사항 아래에 배치
                         .shadow(4.dp), // 🔥 그림자 추가
-                shape = Shapes().small.copy(CornerSize(0.dp))
+                    shape = Shapes().small.copy(CornerSize(0.dp))
                 ) {
                     Row(
                         modifier = Modifier
@@ -279,8 +281,7 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                             Icon(
                                 painter = painterResource(id = R.drawable.cpu),
                                 contentDescription = "AI_SEMI Icon",
-                                modifier = Modifier
-                                    .size(24.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                         },
                         paddingStart = 64
@@ -288,6 +289,9 @@ fun Sidebar(navController: NavController, drawerState: DrawerState) {
                 }
             }
 
+            SidebarButton("패치노트", navController, "patch_notes", drawerState, scope) {
+                Icon(Icons.Default.EditNote, contentDescription = "Patch notes")
+            }
             SidebarButton("About", navController, "developer", drawerState, scope) {
                 Icon(Icons.Default.Info, contentDescription = "Information")
             }

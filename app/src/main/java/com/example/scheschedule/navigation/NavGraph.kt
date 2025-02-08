@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.scheschedule.ui.screens.DeveloperScreen
 import com.example.scheschedule.ui.screens.HomeScreen
+import com.example.scheschedule.ui.screens.PatchNotesScreen
 import com.example.scheschedule.ui.screens.ServiceScreen
 import com.example.scheschedule.ui.screens.SettingsScreen
 import com.example.scheschedule.ui.screens.notice.AiSemiNoticeScreen
@@ -16,10 +17,15 @@ import com.example.scheschedule.ui.screens.notice.ECENoticeScreen
 import com.example.scheschedule.ui.screens.notice.GeneralNoticeScreen
 import com.example.scheschedule.ui.screens.notice.ScholarshipNoticeScreen
 import com.example.scheschedule.viewmodel.DeveloperViewModel
+import com.example.scheschedule.viewmodel.PatchNotesViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NavGraph(navController: NavHostController, developerViewModel: DeveloperViewModel) {
+fun NavGraph(
+    navController: NavHostController,
+    developerViewModel: DeveloperViewModel,
+    patchNotesViewModel: PatchNotesViewModel
+) {
     NavHost(
         navController = navController, startDestination = "home"
     ) {
@@ -34,6 +40,7 @@ fun NavGraph(navController: NavHostController, developerViewModel: DeveloperView
         composable("notice/department_ece") { ECENoticeScreen() }
         composable("notice/department_aisemi") { AiSemiNoticeScreen() }
 
+        composable("patch_notes") { PatchNotesScreen(patchNotesViewModel = patchNotesViewModel) } // ✅ 전달
         composable("developer") { DeveloperScreen(developerViewModel = developerViewModel) }
     }
 }

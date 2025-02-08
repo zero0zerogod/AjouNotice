@@ -72,7 +72,7 @@ fun DeveloperScreen(
                     DeveloperInfoItem("이름: ${developerInfo.name}")
                     DeveloperInfoItem("소속: ${developerInfo.department}")
                     DeveloperInfoItem("학년: ${developerInfo.grade}")
-                    DeveloperInfoItem("역할: ${developerInfo.role}")
+                    DeveloperInfoItem("활동: ${developerInfo.role}")
 
                     Spacer(modifier = Modifier.height(8.dp))
 
